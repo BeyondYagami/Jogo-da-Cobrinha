@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-Br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Cobra</title>
+</head>
+<body>
+
+    <h1>Cobra</h1>
+
+    <canvas id="canvas" width="800" height="500"></canvas>
+    
+    <script>
+
+        const tela = document.querySelector("canvas");
+        const pincel = tela.getContext("2d");
+        const tamanho = 30;
+        const cor = "white";
+        let cobra = [{ x: 50, y: 50 }];
+        let direcao = "ArrowRight";
+        let macaX, macaY;
+
+        function desenhaQuadrado(x, y, tamanho, cor) {
+            pincel.fillStyle = cor;
+            pincel.fillRect(x, y, tamanho, tamanho);
+            pincel.strokeStyle = "orange";
+            pincel.strokeRect(x, y, tamanho, tamanho);
+        }
+
+        function moverCobra() {
+            let cabeca = { ...cobra[0] };
+
+            if (direcao === "ArrowRight") {
+                cabeca.x += tamanho;
+            } else if (direcao === "ArrowLeft") {
+                cabeca.x -= tamanho;
+            } else if (direcao === "ArrowUp") {
+                cabeca.y -= tamanho;
+            } else if (direcao === "ArrowDown") {
+                cabeca.y += tamanho;
+            }
+
+            cobra.unshift(cabeca);
+
+            if (Math.abs(cabeca.x - macaX) < tamanho && Math.abs(cabeca.y - macaY) < tamanho) {
+                criaMacas();
+            } else {
+                cobra.pop();
+            }
+
+            desenha();
+            detectarColisao();
+        }
+
+        function mudarDirecao(event) {
+            if (event.key === "ArrowRight" && direcao !== "ArrowLeft") {
+                direcao = "ArrowRight";
+            } else if (event.key === "ArrowLeft" && direcao !== "ArrowRight") {
+                direcao = "ArrowLeft";
+            } else if (event.key === "ArrowUp" && direcao !== "ArrowDown") {
+                direcao = "ArrowUp";
+            } else if (event.key === "ArrowDown" && direcao !== "ArrowUp") {
+                direcao = "ArrowDown";
+            }
+        }
+
+        function detectarColisao() {
+            let cabeca = cobra[0];
+            if (cabeca.x < 0 || cabeca.x >= tela.width || cabeca.y < 0 || cabeca.y >= tela.height) {
+                alert('Colisão com a borda!');
+                cobra = [{ x: 50, y: 50 }];
+                direcao = "ArrowRight";
+                criaMacas();
+            }
+        }
+
+        function criaMacas() {
+            macaX = Math.floor(Math.random() * (tela.width / tamanho)) * tamanho;
+            macaY = Math.floor(Math.random() * (tela.height / tamanho)) * tamanho;
+        }
+
+        function desenha() {
+            pincel.clearRect(0, 0, tela.width, tela.height);
+            cobra.forEach(segmento => desenhaQuadrado(segmento.x, segmento.y, tamanho, cor));
+            desenhaQuadrado(macaX, macaY, tamanho, "red");
+        }
+
+        document.addEventListener("keydown", mudarDirecao);
+        criaMacas();
+        desenha();
+        setInterval(moverCobra, 200);
+
+    </script>
+    
+</body>
+</html>
